@@ -1,0 +1,58 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ProjectModel
+@{
+    Layout = "_Main_Layout";
+    var title = "";
+    var description = "";
+    var projects = ViewBag.Projects;
+    var projectViewRoute = ViewBag.ProjectViewRoute;
+}
+
+
+<div style="display: flex; justify-content: space-between">
+    <div>
+        <h1>Projects</h1>
+        <p>Logged in as @User.Identity.Name</p>
+    </div>
+    <div style="margin-right: 50px; margin-top:20px">
+        <button type="button" class="btn btn-primary fa-bold btn-lg" data-toggle="modal" data-target="#create-project-form">Create Project</button>
+    </div>
+
+</div>
+
+
+@Html.Partial("/Views/Shared/_CreateProjectForm.cshtml", Model)
+<!--<partial name="/Views/Shared/_CreateProjectForm.cshtml" />-->
+<!-- Modal -->
+
+
+<div style="display: flex; justify-content: center; width: auto; background-color:#eaeffc; height: auto; padding: 10px; margin:55px; border-radius:10px">
+    <div class="d-flex flex-wrap" style="">
+        <!--style="display: flex; flex-wrap: wrap;-->
+        @foreach (ProjectModel project in projects)
+        {
+            <div class="" style="width: 500px; padding: 20px; flex-shrink: 1;">
+            <div class="card shadow mb-4" style="">
+                    <div class="card-header py-3" style="display: inline-flex; justify-content: space-between">
+                        <h5 class="m-0 font-weight-bold text-primary">@project.Title</h5>
+
+                        @Html.ActionLink("View", "ProjectView", "Project", new {projectId = project.ProjectId}, null)
+
+                    </div>
+                    <div class="card-body">
+                        <b>Description: &ensp;</b>@project.Description
+
+                    </div>
+
+
+                </div>
+                
+
+        </div>
+        }
+
+
+    </div>
+</div>

@@ -1,0 +1,143 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@model TicketModel
+
+@{
+    Layout = "_Main_Layout";
+
+    ProjectModel project = ViewBag.ProjectData;
+    List<TicketModel> tickets = ViewBag.TicketsData;
+    //int projectId = ViewBag.ProjectId;
+    string hoverable_table = tickets.Count == 0 ? "" : "table-hover";
+    string clickable_table = tickets.Count == 0 ? "" : "cursor: pointer;";
+
+}
+
+<div style="display: flex; justify-content: space-between">
+    <div>
+        <h1>@project.Title</h1>
+        <h3>Project @project.ProjectId</h3>
+        <p>Logged in as @User.Identity.Name</p>
+        <p>Description: @project.Description</p>
+    </div>
+    <div style="margin-right: 50px; margin-top:20px">
+        
+        <button class="btn btn-danger" href="#" data-toggle="modal" data-target="#delete-project-confirm">Delete Project</button>
+
+        <!--Modal for confirming deletion of project-->
+        @Html.Partial("/Views/Shared/_DeleteProjectConfirmation.cshtml", Model)
+        
+
+        
+    </div>
+
+        
+
+</div>
+
+
+
+@{
+    //Html.Partial("/Views/Shared/_CreateTicketForm.cshtml", TicketModel);
+    ViewData["projectId"] = project.ProjectId;
+
+    var ticketModel = new TicketModel();
+}
+<partial name="/Views/Shared/_CreateTicketForm.cshtml" model="ticketModel" view-data="ViewData" /> <!--view-data="ViewData"-->
+
+<p>________________________</p>
+<div style="display:flex; width:95%; justify-content:space-between">
+    
+        <h4>Tickets</h4>
+        <button type="button" class="btn btn-primary fa-bold btn-lg" data-toggle="modal" data-target="#create-ticket-form">Create Ticket</button>
+    
+    
+</div>
+
+
+<div style="background-color:#ffffff; margin:30px; padding:15px; border-radius:10px; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+
+
+    <table class="table @hoverable_table table-bordered" style="white-space:nowrap; overflow: hidden; table-layout: fixed;">
+        <thead>
+            <tr>
+                <th scope="col" style="width:60px; text-align: center; vertical-align: middle;">ID</th>
+                <th scope="col" style="width:85px">Priority</th>
+                <th scope="col" style="width:125px">Type</th>
+                <th scope="col" style="width:12%">Title</th>
+                <th scope="col" style="">Description</th>
+                <th scope="col" style="width:8%">Author</th>
+                <th scope="col" style="width:13%">Created On</th>
+                <th scope="col" style="width:90px; text-align: center; vertical-align: middle;">Status</th>
+            </tr>
+        </thead>
+        <tbody style="@clickable_table">
+            @if (tickets.Count != 0)
+            {
+                foreach (TicketModel ticket in tickets)
+                {
+                    string priority_badge_color;
+                    string type_badge_color;
+                    if (ticket.Priority == TicketPriority.Low)
+                        priority_badge_color = "success";
+                    else if (ticket.Priority == TicketPriority.Medium)
+                        priority_badge_color = "primary";
+                    else if (ticket.Priority == TicketPriority.High)
+                        priority_badge_color = "warning";
+                    else
+                        priority_badge_color = "danger"; //Critical
+
+                    if (ticket.TicketType == TicketType.Bug)
+                        type_badge_color = "#FF69B4"; //hot pink
+                    if (ticket.TicketType == TicketType.Feature)
+                        type_badge_color = "#ff6e00"; //orange
+                    if (ticket.TicketType == TicketType.Epic)
+                        type_badge_color = "#00FFFF"; //aqua
+                    if (ticket.TicketType == TicketType.Documentation)
+                        type_badge_color = "#a25bff"; //light purple
+                    else
+                        type_badge_color = "#ff449b"; //other
+
+                    <tr onclick="location.href = '@Url.Action("TicketView", "Project", new { ticketId=ticket.TicketId, projectId=project.ProjectId })'">
+                        <th scope="row" style="text-align: center; vertical-align: middle;">@ticket.TicketId</th>
+                        <td style="text-align: center; vertical-align: middle;"><span class="badge badge-pill badge-@priority_badge_color">@ticket.Priority</span></td>
+                        <td style="text-align: center; vertical-align: middle;"><span class="badge badge-pill badge-@type_badge_color" style="color: white; background-color:@type_badge_color !important;">@ticket.TicketType</span></td>
+                        <td><div style="overflow:hidden;">@ticket.Title</div></td>
+                        <td><div style="overflow:hidden;">@ticket.Description</div></td>
+                        <td>@ticket.Author</td>
+                        <td>@ticket.CreatedOn</td>
+                        @if (ticket.ClosedOn == null)
+                        {
+                            <td style="text-align: center; vertical-align: middle;"><span class="badge badge-pill badge-success">Open</span></td>
+                        }
+                        else
+                        {
+                            <td style="text-align: center; vertical-align: middle;"><span class="badge badge-pill badge-danger">Closed</span></td>
+                        }
+
+                    </tr>
+                }
+
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" style="text-align:center;">
+                        <div style="text-align: center"><h5>No Tickets</h5></div>
+                    </td>
+                </tr>
+
+            }
+
+        </tbody>
+    </table>
+</div>
+<div>
+
+    <div style="width:100%; justify-content:right">
+        
+    </div>
+
+</div>

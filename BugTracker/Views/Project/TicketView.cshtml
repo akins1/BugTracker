@@ -1,0 +1,328 @@
+﻿@using BugTracker.Data
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Main_Layout";
+    ProjectModel projectData = ViewBag.ProjectData;
+    TicketModel ticketData = ViewBag.TicketData;
+    List<TicketHistory> historyList = ViewBag.HistoryList;
+    List<TicketComment> commentList = ViewBag.CommentList;
+    List<UserModel> contributors = ViewBag.Contributors;
+    string projectRoute = "/projects/" + projectData.ProjectId + "/view";
+
+
+    string priority_badge_color;
+    string type_badge_color;
+    if (ticketData.Priority == TicketPriority.Low)
+        priority_badge_color = "success";
+    else if (ticketData.Priority == TicketPriority.Medium)
+        priority_badge_color = "primary";
+    else if (ticketData.Priority == TicketPriority.High)
+        priority_badge_color = "warning";
+    else
+        priority_badge_color = "danger"; //Critical
+
+    if (ticketData.TicketType == TicketType.Bug)
+        type_badge_color = "#FF69B4"; //hot pink
+    if (ticketData.TicketType == TicketType.Feature)
+        type_badge_color = "#ff6e00"; //orange
+    if (ticketData.TicketType == TicketType.Epic)
+        type_badge_color = "#00FFFF"; //aqua
+    if (ticketData.TicketType == TicketType.Documentation)
+        type_badge_color = "#a25bff"; //light purple
+    else
+        type_badge_color = "#ff449b"; //other
+
+    BugTrackerDbContext _db = ViewBag.DbContext;
+
+    static void AddComment(BugTrackerDbContext dbContext, string Author, string Description, DateTime date)
+    {
+        //TicketComment comment
+
+        //db
+    };
+
+}
+@model TicketModel
+
+<div style="display:flex; justify-content:space-between">
+    <div>
+        <h2>Ticket View</h2>
+        <h3>Project: @projectData.Title</h3>
+        <p>Logged in as @User.Identity.Name</p>
+    </div>
+
+    <div>
+        <!--DELETE ticket button-->
+        <!--<a class="btn btn-danger" href='@Url.Action("DeleteTicket", "Project", new { projectId=ticketData.ProjectId, ticketId=ticketData.TicketId })'>Delete</a>-->
+        <button class="btn btn-danger" href="#" data-toggle="modal" data-target="#delete-ticket-confirm">Delete Ticket</button>
+
+        <!--Modal for confirming deletion of project-->
+        @Html.Partial("/Views/Shared/_DeleteTicketConfirmation.cshtml", Model)
+        
+
+    </div>
+
+</div>
+
+<div style="display:block; width:100%; margin:auto">
+
+
+    <div style="display:block; width:60%; margin:auto">
+        <div class="card" style="width:100%;  color:black; margin-bottom: 25px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        margin-right: 20px">
+            <div class="card-header">
+                <div style="display: flex; justify-content:space-between">
+                    <h3 style="margin-top:15px">Details For Ticket #@ticketData.TicketId</h3>
+                    <a class="btn btn-outline-primary" style="font-size: 20px;
+                    justify-content:center; text-align:center; display: flex;
+                    flex-direction: column; ">Edit</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm" style="margin-bottom: 15px">
+                            <div>
+                                <h5>Title</h5>
+                                <p style="margin-left: 30px"><i>@ticketData.Title </i></p>
+                            </div>
+                            <div>
+                                <h5>Description</h5>
+                                <p style="margin-left: 30px"><i>@ticketData.Description </i></p>
+                            </div>
+                            <div>
+                                <h5>Author</h5>
+                                <p style="margin-left: 30px"><i>@ticketData.Author </i></p>
+                            </div>
+                            <div>
+                                <h5>Contributors</h5>
+                                @if (contributors.Count == 0)
+                                {
+                                    <p style="margin-left: 30px"><i>No Contributors </i></p>
+                                }
+                                else
+                                {
+                                    string contributorsString = "";
+                                    foreach (UserModel user in contributors)
+                                    {
+                                        contributorsString += user.UserName + ", ";
+                                    }
+                                    contributorsString.Substring(contributorsString.Length - 3);
+
+                                    <p style="margin-left: 30px"><i>@contributorsString </i></p>
+                                }
+
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-sm">
+                                        <h5>Ticket ID: <i>@ticketData.TicketId</i></h5>
+                                        <p>&nbsp;&nbsp;&nbsp;&nbsp; </p>
+                                    </div>
+                                    <div class="col-sm">
+                                        <h5>Project ID: <i>@ticketData.ProjectId</i></h5>
+                                        <p>&nbsp;&nbsp;&nbsp;&nbsp; </p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                            <div>
+                                <h5>Priority </h5>
+                                <span class="badge badge-pill badge-@priority_badge_color" style="margin-left: 30px; margin-bottom:20px">@ticketData.Priority</span>
+
+
+                            </div>
+                            <div>
+                                <h5>Type </h5>
+                                <span class="badge badge-pill badge-@type_badge_color" style="margin-left: 30px; margin-bottom:20px; color: white; background-color:@type_badge_color !important;">@ticketData.TicketType</span>
+                            </div>
+                            <div style="display: inline">
+                                <h5>Status: </h5>
+                                <p style="margin-left: 30px">
+                                    <i>
+                                        @if (ticketData.ClosedOn == null)
+                                        {
+                                            <span class="badge badge-pill badge-success" style="justify-content:center">Open</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-pill badge-success" style="justify-content:center">Closed</span>
+                                        }
+                                    </i>
+                                </p>
+                            </div>
+                            <div>
+                                <h5>Date Created </h5>
+                                <p style="margin-left: 30px"><i>@ticketData.CreatedOn</i></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div style="display:flex; width: 90%; margin:auto;">
+        <!-- TICKET COMMENTS -->
+        <div class="card" style="width:80%;  color:black;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        margin: 0 auto;">
+            <div class="card-header">
+                <div>
+                    <h3 style="margin-top:15px">Comments For Ticket #@ticketData.TicketId</h3>
+
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container">
+
+
+                    <table class="table table-bordered" style="white-space:nowrap; overflow: hidden; table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width:85px">Author</th>
+                                <th scope="col" style="width:85px">Comment</th>
+                                <th scope="col" style="width:85px">Date</th>
+
+                            </tr>
+                        </thead>
+                        <tbody style="">
+                            @if (commentList.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="3" style="text-align:center;">
+                                        <div style="text-align: center"><h5>No Comments</h5></div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+
+
+                                foreach (TicketComment comment in commentList)
+                                {
+                                    <tr>
+                                        <td scope="row">
+                                            @comment.Author
+                                        </td>
+                                        <td>
+                                            @comment.Description
+                                        </td>
+                                        <td>
+                                            @comment.CreatedOn
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+
+
+                    <!--Create ability to add comments-->
+                    <div style="width:100%" ;>
+                        <span style="width:100%; display:flex; ">
+                            <input type="text" style="width:80%; margin:5px" />
+                            <a class="btn btn-primary" style="width:20%; margin:5px" onclick="">Submit</a>
+                        </span>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+        <div style="min-height:1px; width:50px"></div>
+
+
+        <!-- TICKET HISTORY -->
+
+        <div class="card" style="width:80%;  color:black;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        margin: 0 auto;
+                        ">
+            <div class="card-header">
+                <div>
+                    <h3 style="margin-top:15px">History For Ticket #@ticketData.TicketId</h3>
+
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container">
+
+
+                    <table class="table table-bordered" style="white-space:nowrap; overflow: hidden; table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width:85px">Author</th>
+                                <th scope="col" style="width:85px">Description</th>
+                                <th scope="col" style="width:85px">Date</th>
+
+                            </tr>
+                        </thead>
+                        <tbody style="">
+                            <tr>
+                                <td scope="row">
+                                    System
+                                </td>
+                                <td>
+                                    Ticket Created
+                                </td>
+                                <td>
+                                    @ticketData.CreatedOn
+                                </td>
+                            </tr>
+                            @if (historyList.Count != 0)
+
+                            {
+
+
+                                foreach (TicketHistory history in historyList)
+                                {
+                                    <tr>
+                                        <td scope="row">
+                                            @history.Author
+                                        </td>
+                                        <td>
+                                            @history.Description
+                                        </td>
+                                        <td>
+                                            @history.CreatedOn
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+
+
+                    <!--Create ability to add comments-->
+                    <div style="width:100%" ;>
+                        <span style="width:100%; display:flex; ">
+                            <input type="text" style="width:80%; margin:5px" />
+                            <a class="btn btn-primary" style="width:20%; margin:5px" onclick="">Submit</a>
+                        </span>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

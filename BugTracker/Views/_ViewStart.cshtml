@@ -1,0 +1,12 @@
+﻿@{
+    if (User.Identity.IsAuthenticated)
+    {
+        Layout = "_Main_Layout";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+    
+    
+}
