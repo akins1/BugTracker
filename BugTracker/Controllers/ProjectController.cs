@@ -1,4 +1,5 @@
-﻿using BugTracker.Data;
+﻿using Auth0.ManagementApi.Models;
+using BugTracker.Data;
 using BugTracker.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,11 +60,35 @@ namespace BugTracker.Controllers
 
             ViewBag.ProjectData = projectData;
             ViewBag.TicketsData = ticketsData;
+            ViewData["projectId"] = projectId;
             //ViewBag.TicketViewRoute1 = "/projects/";
             //ViewBag.TicketViewRoute2 = "/tickets/";
 
             return View();
         }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult EditProject(ProjectModel project)
+        {
+            //TODO
+            //Edit junctions/users
+
+            ProjectModel newProject = _db.Projects.SingleOrDefault(p => p.ProjectId == project.ProjectId);
+
+            if (newProject != null)
+            {
+                newProject.Title = project.Title;
+                newProject.Description = project.Description;
+
+
+                _db.SaveChanges();
+            }
+
+            return RedirectToAction("ProjectView", new { projectId = project.ProjectId });
+
+        }
+
 
         [Authorize]
         [HttpPost]
@@ -85,8 +110,10 @@ namespace BugTracker.Controllers
             ProjectModel projectData =        _db.Projects.Single(p => p.ProjectId == projectId);
 
             TicketModel ticketData =          _db.Tickets.Single(t => t.TicketId == ticketId);
-            List<TicketHistory> historyList = _db.TicketHistory.Where(history => history.TicketId == ticketData.TicketId).ToList();
-            List<TicketComment> commentList = _db.TicketComment.Where(comment => comment.TicketId == ticketData.TicketId).ToList();
+            List<TicketHistory> historyList = _db.TicketHistory.Where(history => history.TicketId == ticketData.TicketId)
+                                                               .ToList();
+            List<TicketComment> commentList = _db.TicketComment.Where(comment => comment.TicketId == ticketData.TicketId)
+                                                               .ToList();
             List<int> contributorsId =        _db.TicketAssignedToJunction.Where(entry => entry.TicketId == ticketData.TicketId)
                                                                           .Select(entry => entry.UserId)
                                                                           .ToList();
@@ -101,12 +128,34 @@ namespace BugTracker.Controllers
             ViewBag.HistoryList = historyList;
             ViewBag.CommentList = commentList;
             ViewBag.Contributors = contributors;
-            ViewBag.DBContext = _db;
+            ViewData["projectId"] = projectId;
+            ViewData["ticketId"] = ticketId;
+            //ViewBag.DBContext = _db;
 
             return View();
         }
 
-        
+        [Authorize]
+        [HttpPost]
+        public IActionResult EditTicket(TicketModel ticket)
+        {
+
+            TicketModel newTicket = _db.Tickets.SingleOrDefault(t => t.TicketId == ticket.TicketId);
+
+            if (newTicket != null)
+            {
+                newTicket.Title = ticket.Title;
+                newTicket.Description = ticket.Description;
+                newTicket.TicketType = ticket.TicketType;
+                newTicket.Priority = ticket.Priority;
+                newTicket.Title = ticket.Title;
+
+                _db.SaveChanges();
+            }
+
+            return RedirectToAction("TicketView", new { ticketId = ticket.TicketId, projectId = ticket.ProjectId });
+
+        }
 
         [HttpPost, ActionName("DeleteTicket")]
         [ValidateAntiForgeryToken]
@@ -152,7 +201,7 @@ namespace BugTracker.Controllers
 
             _db.SaveChanges();
 
-            return RedirectToAction("Projects", "Project");
+            return RedirectToAction("Projects", "Project", new { projectId = projectId});
         }
     }
 }

@@ -22,15 +22,17 @@
         <p>Logged in as @User.Identity.Name</p>
         <p>Description: @project.Description</p>
     </div>
-    <div style="margin-right: 50px; margin-top:20px">
+    <div style="margin-right: 50px; margin-top:20px; display: block">
         
         <button class="btn btn-danger" href="#" data-toggle="modal" data-target="#delete-project-confirm">Delete Project</button>
 
         <!--Modal for confirming deletion of project-->
         @Html.Partial("/Views/Shared/_DeleteProjectConfirmation.cshtml", Model)
         
-
+        <button class="btn btn-primary" href="#" data-toggle="modal" data-target="#edit-project-form">Edit Project</button>
         
+        @Html.Partial("/Views/Shared/_EditProjectForm.cshtml", project)
+
     </div>
 
         
@@ -39,21 +41,21 @@
 
 
 
-@{
-    //Html.Partial("/Views/Shared/_CreateTicketForm.cshtml", TicketModel);
-    ViewData["projectId"] = project.ProjectId;
-
-    var ticketModel = new TicketModel();
-}
-<partial name="/Views/Shared/_CreateTicketForm.cshtml" model="ticketModel" view-data="ViewData" /> <!--view-data="ViewData"-->
 
 <p>________________________</p>
 <div style="display:flex; width:95%; justify-content:space-between">
     
         <h4>Tickets</h4>
         <button type="button" class="btn btn-primary fa-bold btn-lg" data-toggle="modal" data-target="#create-ticket-form">Create Ticket</button>
-    
-    
+        @{
+            //Html.Partial("/Views/Shared/_CreateTicketForm.cshtml", TicketModel);
+            ViewData["projectId"] = project.ProjectId;
+
+            var ticketModel = new TicketModel();
+        }
+        <partial name="/Views/Shared/_CreateTicketForm.cshtml" model="ticketModel" view-data="ViewData" /> <!--view-data="ViewData"-->
+
+        
 </div>
 
 

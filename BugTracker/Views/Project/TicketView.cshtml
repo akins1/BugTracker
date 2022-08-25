@@ -76,9 +76,11 @@
             <div class="card-header">
                 <div style="display: flex; justify-content:space-between">
                     <h3 style="margin-top:15px">Details For Ticket #@ticketData.TicketId</h3>
-                    <a class="btn btn-outline-primary" style="font-size: 20px;
+                    <button data-toggle="modal" data-target="#edit-ticket-form" class="btn btn-outline-primary" style="font-size: 20px;
                     justify-content:center; text-align:center; display: flex;
-                    flex-direction: column; ">Edit</a>
+                    flex-direction: column; ">Edit</button>
+                    @Html.Partial("/Views/Shared/_EditTicketForm.cshtml", ticketData)
+
                 </div>
             </div>
             <div class="card-body">
