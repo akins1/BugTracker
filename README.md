@@ -5,7 +5,7 @@ On the front-end, users are able to authenticate into the app, and create "Proje
 This project uses the MVC architectural pattern and relies on an MS SQL Entity Framwork Database.
 
 Demo
-![Bug Tracker Demo]()
+![Bug Tracker Demo](BugTrackerDemo.gif)
 
 ### Description
 
